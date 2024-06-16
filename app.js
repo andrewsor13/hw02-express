@@ -4,12 +4,14 @@ const morgan = require("morgan");
 const dotenv = require("dotenv");
 const corsOptions = require("./cors");
 const routerApi = require("./routes/index.js");
+const mongoose = require("mongoose");
 
 dotenv.config();
 
 const app = express();
 
 const PORT = process.env.PORT || 5000;
+const DB_URL = process.env.DB_URL;
 
 app.use(express.json());
 
@@ -37,6 +39,14 @@ app.use((err, _, res, __) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port: ${PORT}`);
-});
+mongoose
+  .connect(DB_URL)
+  .then(() => {
+    console.log("MongoDB is running.");
+    app.listen(PORT, () => {
+      console.log(`Server is running on port: ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error(`Serverul nu ruleaza. ${err.message}`);
+  });
